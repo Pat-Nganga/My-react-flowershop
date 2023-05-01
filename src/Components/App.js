@@ -1,81 +1,32 @@
-// import React, { useState } from 'react'
-// import CreateForm from './CreateForm'
-// import FlowerList from './FlowerList'
-// import FlowerCard from './FlowerCard'
+import { useEffect, useState } from 'react';
+import './css/App.css';
+import Menu from './Menu'
+import Form from './Form'
+import Content from './Content';
 
-// function App() {
-  
-//   return (
-//     <div className='menu'>
-//       <div className='logo'>
-//         <h3>FLORA BY EMZ</h3>
-//       </div>
-//       <nav>
-//         <ul className='navigation'>
-//           <li id='link-home' className='nav-link'>
-//             <a href='#Home'>Home</a>
-//           </li>
-//           <li className='nav-link'>
-//             <a href='#Subscribe'>Subscribe</a>
-//           </li>
-//           <li className='nav-link'>
-//             <a href='#Shop'>Shop</a>
-//           </li>
-//           <li className='nav-link'>
-//             <a href='#Contact'>Contact</a>
-//           </li>
-//         </ul>
-//       </nav>
-//       <div className='search'>
-//         <form>
-//           <label htmlFor='search'></label>
-//           <input
-//             type='text'
-//             className='input'
-//             id='search-input'
-//             name='search'
-//             placeholder='.....search flowers...'
-//           />
-//         </form>
-//       </div>
-//     </div>
-//   )
-// }
+const App = () => {
+  const [data, setData] = useState([])
+  const [endpoint, setEndpoint] = useState('http://localhost:3000/flowers?_sort=id&_order=desc')
 
-// export default App
-
-
-import React, { useState, useEffect } from 'react'
-import CreateForm from './CreateForm'
-import FlowerList from './FlowerList'
-import FlowerCard from './FlowerCard'
-
-function App() {
-  const [flowers, setFlowers] = useState([])
-
+  const fetchData = async () => {
+    const response = await fetch(endpoint);
+    const flowers = await response.json();
+    return flowers;
+  }
   useEffect(() => {
-    fetch( 'http://localhost:3000/flowers'
-)
-      .then((response) => response.json())
-      .then((data) => setFlowers(data))
-      .catch((error) => console.error(error))
+    fetchData().then(res => {
+      setData(res)
+    }).catch(err => {
+      console.log("Error in fetching flowers: ",err)
+    })
   }, [])
-
   return (
-    <div>
-      <CreateForm />
-      <FlowerList>
-        {flowers.map((flower) => (
-          <FlowerCard key={flower.id} flower={flower} />
-        ))}
-      </FlowerList>
+    <div className="App">
+      <Menu setData={setData} fetchData={fetchData} setEndpoint = {setEndpoint}/>
+      <Form flowers={data} setData={setData} fetchData={fetchData} />
+      <Content flowers={data} setData={setData} fetchData={fetchData} />
     </div>
-  )
+  );
 }
 
-export default App
-
-
-
-
-
+export default App;
